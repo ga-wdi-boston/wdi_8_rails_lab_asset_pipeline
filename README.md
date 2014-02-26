@@ -57,18 +57,36 @@
 
 ### Step Two  
 * Open the js manifest, app/assets/javascript/application.js. This contains commands that are processed by the "Sprockets" gem. 
+
+* Goto the docs for the Sprockets gem and take a look at its [Directives](https://github.com/sstephenson/sprockets#the-directive-processor). We are using the require and require_tree directives.
     
-The jquery, jquery_ujs and turbolinks are required. They are gems include in your Gemfile. These  gems contain the files that are concatenated into  http://localhost:3000/assets/application.js
+	This application.js file 'requires', or adds, the jquery, jquery_ujs and turbolinks javascirpt libraries. But, where are these javacript files?
+
+* Look for files in this rails app. Can you find them?  
+
+ 	These javascript files are added to the rails app via there respective gems. 
+ 
+* Open up the Gemfile and look for gems that provide these javascript files. 
+
+	The jquery-rails gem provides the jquery and jquery-ujs javascript files. The turbolinks gem provides the turbolink javascript file.
+	
+* These javascript files that are concatenated into  http://localhost:3000/assets/application.js
+
+	This is done to increase the page load time. Instead of making a HTTP Request for each javascript file we only make **one** HTTP Request.
+
 
  * Start the server and goto 
      http://localhost:3000/assets/application.js
-     We'll see a very large file with lots of js. This is the concatenation of all the app's js
-     into one file. Done by the asset pipeline.
+     
+     We'll see a very large file with lots of js. This is the concatenation of all the app's js into one file. Done by the asset pipeline.
 
+	In production mode this one big javascript file will be minimized before being sent back to the client.
+	
 * Let remove all the //= require lines
 
-* goto http://localhost:3000/assets/application.js
-      Now there is no js shown, boohoo.
+* goto http://localhost:3000/assets/application.js  
+
+	Now there is no js shown, boohoo.
 
 ### Step Three
 * Put the two jquery require lines back and add an alert to the end of applicaton.js
