@@ -53,90 +53,114 @@
     the SASS and Coffescript preprocessor to create css and js file.
 
 
-### Step Two
-    * Open the js manifest, app/assets/javascript/application.js. This contains commands that are processed by the "Sprockets" gem. 
+### Step Two  
+* Open the js manifest, app/assets/javascript/application.js. This contains commands that are processed by the "Sprockets" gem. 
     
-    The jquery, jquery_ujs and turbolinks are required. They are gems include in your Gemfile. These  gems contain the files that are concatenated into  http://localhost:3000/assets/application.js
+The jquery, jquery_ujs and turbolinks are required. They are gems include in your Gemfile. These  gems contain the files that are concatenated into  http://localhost:3000/assets/application.js
 
-    * Let remove all the //= require lines
+* Let remove all the //= require lines
 
-    * goto http://localhost:3000/assets/application.js
+* goto http://localhost:3000/assets/application.js
       Now there is no js shown, boohoo.
 
 ### Step Three
-    * Put the two jquery require lines back and add an alert to the end of applicaton.js
+* Put the two jquery require lines back and add an alert to the end of applicaton.js
       <code>
         alert("hey I'm in the application.js file");
       </code>      
-    * goto http://localhost:3000/assets/application.js
+
+* goto http://localhost:3000/assets/application.js
       At the end of the file is our alert.
-    * goto http://localhost:3000/songs
+
+* goto http://localhost:3000/songs
       The alert box will be shown.
     We are seeing that anything that we put in the manifest file is included in each
     page we visit. This is included by the following line in your layout file.
      <%= javascript_include_tag "application", "data-turbolinks-track" => true %>
     
-### Step Four
-    * create a main.js in the javascript assets directory and add it to manifest
-      touch app/assets/javascript/main.js
-    * move the alert from the application.js to the main.js.
-    * goto http://localhost:3000/songs
-      $(document).ready(function(){
-        alert("hey I'm in the main.js file");
-      });
+### Step Four  
 
+* create a main.js in the javascript assets directory and add it to manifest
+      touch app/assets/javascript/main.js
+
+* move the alert from the application.js to the main.js.
+
+* goto http://localhost:3000/songs
+
+	<code>
+	      $(document).ready(function(){  
+            alert("hey I'm in the main.js file");  
+          });
+	</code>
+	
 ### Step Five
-    * Create a seed file for songs and seed db.
+
+* Create a seed file for songs and seed db.  
+    
+    <code>
     Song.create(name: "Royals", duration: 186, price: 3.99)
     Song.create(name: "Wrecking Ball", duration: 195, price: 3.49)
     Song.create(name: "Roar", duration: 205, price: 2.99)
     Song.create(name: "Wake me up", duration: 243, price: 2.49)
-    * goto /songs and view songs.
+    </code>
+    
+* goto /songs and view songs.
 
 ### Step Six
-    * This should be the contents of the app/views/songs/index.html.erb file.
-    <ul id='songs'>
-    <%= @songs.each do |song| %>
-      <li>Name: <%=song.name %>, Duration(minutes): <%=song.duration %>, Price(dollars): <%=song.price %> </li>
-    <% end %>
-    </ul>
-    <br>
 
-    <%= link_to 'New Song', new_song_path, id: 'new_link', remote: true %>
+* This should be the contents of the app/views/songs/index.html.erb file.  
+   
+    ``<ul id='songs'>``  
+    ``<%= @songs.each do |song| %>``  
+    ``<li>Name: <%=song.name %>, Duration(minutes): <%=song.duration %>, Price(dollars): <%=song.price %> </li>``  
+    ``<% end %>``  
+    ``</ul>``  
+    ``<br>``  
 
-    * Notice that we've added the 'remote: true' to the new song link. This make 
+    ``<%= link_to 'New Song', new_song_path, id: 'new_link', remote: true %>``  
+	
+
+* Notice that we've added the 'remote: true' to the new song link. This will make 
     the form submit an ajax request. It will *not* reload the page.
 
 ### Step Seven
-    * Create a new.js.erb file with this contents.
-      $('#new_link').hide().after('<%= j render("form") %>')
-    * Change the first line of the _form.html.erb to be.
-      <%= form_for(@song, :remote => true) do |f| %>
-    * Update the create action to respond to a javascript/ajax request. 
-    def create
-    ... # add under the format.json {...} 
-      format.js 
-    ..
-    end
-    
-    * Add a create.js.erb file with the below contents.
-    $('#new_task').remove();
-    $('#new_link').show();
-    $('#songs').append("<li>"+ "Name: <%=@song.name %>" + ", Duration(minutes): <%=@song.duration %>" + ", Price(dollars): <%=@song.price %>" + "</li>");
-    $('#new_song').hide();
+* Create a new.js.erb file with this contents.  
+      `` $('#new_link').hide().after('<%= j render("form") %>')``
 
-    * This will use jquery selectors to change the index page.
+* Change the first line of the _form.html.erb to be.    
+      `` <%= form_for(@song, :remote => true) do |f| %> ``
+
+* Update the create action to respond to a javascript/ajax request.   
+
+    ``def create``   
+    `` ... ``  
+    ``  format.js ``  
+    ``   .. ``  
+    ``end``  
+    
+* Add a create.js.erb file with the below contents.  n
+
+    ``$('#new_task').remove();``  
+    ``$('#new_link').show();``  
+    ``$('#songs').append("<li>"+ "Name: <%=@song.name %>" + ", Duration(minutes): <%=@song.duration %>" + ", Price(dollars): <%=@song.price %>" + "</li>");``
+    ``$('#new_song').hide();``   
+
+* This will use jquery selectors to change the index page.
 
 ## Step Eight
-   * Create a file show.js.erb with this contents.
-     <li><%=song.name%></li>
 
-   * Goto http://localhost:3000/songs and create a new song.
-   Notice how there are *no* page reloads when creating new songs. All 
+* Create a file show.js.erb with this contents.  
+     ``<li><%=song.name%></li>``
+
+* Goto http://localhost:3000/songs and create a new song.  
+  Notice how there are *NO* page reloads when creating new songs. All 
    the creations are done via ajax and jquery.
 
 ## Resources
-   * Watch railscast for asset pipeline. Couple of thngs are outdated, but still very good.
+
+* Watch railscast for asset pipeline. Couple of thngs are outdated, but still very good.  
      [Railscast for Asset Pipeline](http://railscasts.com/episodes/279-understanding-the-asset-pipeline
-   * [Rails Guide for Asset Pipeline](http://guides.rubyonrails.org/asset_pipeline.html)
-   * [JQuery and Ajax](http://railscasts.com/episodes/136-jquery-ajax-revised)
+
+* [Rails Guide for Asset Pipeline](http://guides.rubyonrails.org/asset_pipeline.html)  
+
+* [JQuery and Ajax](http://railscasts.com/episodes/136-jquery-ajax-revised)  
