@@ -117,19 +117,26 @@
     
 ### Step Four  
 
-* create a main.js in the javascript assets directory and add it to manifest
+* create a main.js in the javascript assets directory.
       touch app/assets/javascript/main.js
 
+* replace the require_tree directive in the manifest, application.js with 
+
+	``//= require main``  
+	
 * move the alert from the application.js to the main.js.
+
+	``$(document).ready(function(){  ``  
+    ``   alert("hey I'm in the main.js file");``  
+    ``      });``  
 
 * goto http://localhost:3000/songs
 
-	<code>
-	      $(document).ready(function(){  
-            alert("hey I'm in the main.js file");  
-          });
-	</code>
+Some consider using the require_tree directive as sloppy. It just slurps up all 
+the javascript files. It _MAY_ be better to explicitly include resources using other Sprockets directives such as require and require_directory.
 	
+This [Asset Pipeline Article](http://railsapps.github.io/rails-javascript-include-external.html) gives a good overview of how one can selectively add javascript files to a rails app.
+
 ### Step Five
 
 * Create a seed file for songs and seed db.  
