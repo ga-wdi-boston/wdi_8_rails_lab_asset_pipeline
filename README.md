@@ -19,35 +19,37 @@
 ## Concatenate Assets, Javascript and CSS.
 
 ### Step One
-   * Generate a rails app. rails new songs_app -D postgres -T 
-   * Do all the init stuff. Create db, fix database.yml, etc.
-   * Generate a scaffold controller for the Song model.
+
+* Generate a scaffold controller for the Song model.
      
      <code>rails g scaffold Song name:string duration:integer price:float</code>
-   * Notice that 2 asset files have been generated. **We'll come back to this in Advanced Rails.**
 
-      <code>app/assets/javascripts/songs.js.coffee and app/assets/stylesheets/songs.css.scss </code>
+* Notice that 2 asset files have been generated. **We'll come back to this when looking at Coffeescript.**  
 
-   * Start the server and goto 
-     http://localhost:3000/assets/application.js
-     We'll see a very large file with lots of js. This is the concatenation of all the app's js
-     into one file. Done by the asset pipeline.
-   * Create a file named greeting.txt and enter some text.
+	``app/assets/javascripts/songs.js.coffee``  
+	``app/assets/stylesheets/songs.css.scss``
 
-      <code>touch app/assets/javascripts/greeting.txt</code>
-   	* Go to the [Greeting URL](http://localhost:3000/assets/greeting.js).
-      Notice it just displays the file at that location.
-   * Move the greeting.txt file to greeting.txt.erb and add this to the contents
-
-   	<code>
-     <% 5.times do %>
-       Hello Cruel World.
-     <% end %>
-     </code>
-
-  *  Go to the [Greeting URL](http://localhost:3000/assets/greeting.js)
+* Start the server.
     
-    Notice how we ran ruby using ERB. This executed the ruby and created a text file, greeting.txt, with 5 "Hello, Cruel World." strings.
+* Create a file named greeting.txt and enter some text.
+
+	``touch app/assets/javascripts/greeting.txt``  
+
+* Go to the URL http://localhost:3000/assets/greeting.txt .  
+	 Notice it just displays the file at that location.
+
+* Move the greeting.txt file to greeting.txt.erb and add this to the contents
+
+     ``<% 5.times do %>``  
+     ``Hello Cruel World.``  
+     ``<% end %>``  
+
+*  Go to the http://localhost:3000/assets/greeting.txt
+    
+    Notice how we ran ruby using ERB. The asset pipeline pre-processor maps the 
+    file extensions to processors. It starts at the rightmost file extension, __.erb in this case__ , and passes the file thru each processor.
+    
+   This executed the ruby and created a text file, greeting.txt, with 5 "Hello, Cruel World." strings.
 
     This is how the asset pipeline works with SASS and Coffeescript files. It runs
     the SASS and Coffescript preprocessor to create css and js file.
@@ -57,6 +59,11 @@
 * Open the js manifest, app/assets/javascript/application.js. This contains commands that are processed by the "Sprockets" gem. 
     
 The jquery, jquery_ujs and turbolinks are required. They are gems include in your Gemfile. These  gems contain the files that are concatenated into  http://localhost:3000/assets/application.js
+
+ * Start the server and goto 
+     http://localhost:3000/assets/application.js
+     We'll see a very large file with lots of js. This is the concatenation of all the app's js
+     into one file. Done by the asset pipeline.
 
 * Let remove all the //= require lines
 
