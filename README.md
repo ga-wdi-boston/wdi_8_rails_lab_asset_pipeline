@@ -19,35 +19,37 @@
 ## Concatenate Assets, Javascript and CSS.
 
 ### Step One
-   * Generate a rails app. rails new songs_app -D postgres -T 
-   * Do all the init stuff. Create db, fix database.yml, etc.
-   * Generate a scaffold controller for the Song model.
+
+* Generate a scaffold controller for the Song model.
      
      <code>rails g scaffold Song name:string duration:integer price:float</code>
-   * Notice that 2 asset files have been generated. **We'll come back to this in Advanced Rails.**
 
-      <code>app/assets/javascripts/songs.js.coffee and app/assets/stylesheets/songs.css.scss </code>
+* Notice that 2 asset files have been generated. **We'll come back to this when looking at Coffeescript.**  
 
-   * Start the server and goto 
-     http://localhost:3000/assets/application.js
-     We'll see a very large file with lots of js. This is the concatenation of all the app's js
-     into one file. Done by the asset pipeline.
-   * Create a file named greeting.txt and enter some text.
+	``app/assets/javascripts/songs.js.coffee``  
+	``app/assets/stylesheets/songs.css.scss``
 
-      <code>touch app/assets/javascripts/greeting.txt</code>
-   	* Go to the [Greeting URL](http://localhost:3000/assets/greeting.js).
-      Notice it just displays the file at that location.
-   * Move the greeting.txt file to greeting.txt.erb and add this to the contents
-
-   	<code>
-     <% 5.times do %>
-       Hello Cruel World.
-     <% end %>
-     </code>
-
-  *  Go to the [Greeting URL](http://localhost:3000/assets/greeting.js)
+* Start the server.
     
-    Notice how we ran ruby using ERB. This executed the ruby and created a text file, greeting.txt, with 5 "Hello, Cruel World." strings.
+* Create a file named greeting.txt and enter some text.
+
+	``touch app/assets/javascripts/greeting.txt``  
+
+* Go to the URL http://localhost:3000/assets/greeting.txt .  
+	 Notice it just displays the file at that location.
+
+* Move the greeting.txt file to greeting.txt.erb and add this to the contents
+
+     ``<% 5.times do %>``  
+     ``Hello Cruel World.``  
+     ``<% end %>``  
+
+*  Go to the http://localhost:3000/assets/greeting.txt
+    
+    Notice how we ran ruby using ERB. The asset pipeline pre-processor maps the 
+    file extensions to processors. It starts at the rightmost file extension, __.erb in this case__ , and passes the file thru each processor.
+    
+   This executed the ruby and created a text file, greeting.txt, with 5 "Hello, Cruel World." strings.
 
     This is how the asset pipeline works with SASS and Coffeescript files. It runs
     the SASS and Coffescript preprocessor to create css and js file.
@@ -55,106 +57,85 @@
 
 ### Step Two  
 * Open the js manifest, app/assets/javascript/application.js. This contains commands that are processed by the "Sprockets" gem. 
-    
-The jquery, jquery_ujs and turbolinks are required. They are gems include in your Gemfile. These  gems contain the files that are concatenated into  http://localhost:3000/assets/application.js
 
+* Goto the docs for the Sprockets gem and take a look at its [Directives](https://github.com/sstephenson/sprockets#the-directive-processor). We are using the require and require_tree directives.
+    
+	This application.js file 'requires', or adds, the jquery, jquery_ujs and turbolinks javascirpt libraries. But, where are these javacript files?
+
+* Look for files in this rails app. Can you find them?  
+
+ 	These javascript files are added to the rails app via there respective gems. 
+ 
+* Open up the Gemfile and look for gems that provide these javascript files. 
+
+	The jquery-rails gem provides the jquery and jquery-ujs javascript files. The turbolinks gem provides the turbolink javascript file.
+	
+* These javascript files that are concatenated into  http://localhost:3000/assets/application.js
+
+	This is done to increase the page load time. Instead of making a HTTP Request for each javascript file we only make **one** HTTP Request.
+
+
+ * Start the server and goto 
+     http://localhost:3000/assets/application.js
+     
+     We'll see a very large file with lots of js. This is the concatenation of all the app's js into one file. Done by the asset pipeline.
+
+	In production mode this one big javascript file will be minimized before being sent back to the client.
+	
 * Let remove all the //= require lines
 
-* goto http://localhost:3000/assets/application.js
-      Now there is no js shown, boohoo.
+* goto http://localhost:3000/assets/application.js  
+
+	Now there is no js shown, boohoo.
 
 ### Step Three
 * Put the two jquery require lines back and add an alert to the end of applicaton.js
-      <code>
-        alert("hey I'm in the application.js file");
-      </code>      
+      ``alert("hey I'm in the application.js file");``
 
 * goto http://localhost:3000/assets/application.js
       At the end of the file is our alert.
 
-* goto http://localhost:3000/songs
-      The alert box will be shown.
-    We are seeing that anything that we put in the manifest file is included in each
-    page we visit. This is included by the following line in your layout file.
-     <%= javascript_include_tag "application", "data-turbolinks-track" => true %>
+* goto http://localhost:3000/songs  
+	The alert box will be shown. We are seeing that anything that we put in this manifest file is included in each page we visit. 
+	
+	
+* open up the layout file. And find the below line.
+     ``<%= javascript_include_tag "application", "data-turbolinks-track" => true %>``  
+
+	This line uses a Rails method to include javascript files. 
+
+* goto http://localhost:3000/songs and view the source.
+	
+	Notice how the jquery, jquery_ujs, turbolinks, songs.js and application.js files are including in the page. 
+
+* click on the songs.js and the application.js in the source view.
+	
+	These files where:
+	1. Including by the Sprockets directives in the manifest file.
+	2. The songs.js was generated from the _Coffeescript_ file, songs.js.coffee. It was generated by the _Coffeescript_ preprocessor.
+
     
 ### Step Four  
 
-* create a main.js in the javascript assets directory and add it to manifest
+* create a main.js in the javascript assets directory.
       touch app/assets/javascript/main.js
 
+* replace the require_tree directive in the manifest, application.js with 
+
+	``//= require main``  
+	
 * move the alert from the application.js to the main.js.
+
+	``$(document).ready(function(){  ``  
+    ``   alert("hey I'm in the main.js file");``  
+    ``      });``  
 
 * goto http://localhost:3000/songs
 
-	<code>
-	      $(document).ready(function(){  
-            alert("hey I'm in the main.js file");  
-          });
-	</code>
+Some consider using the require_tree directive as sloppy. It just slurps up all 
+the javascript files. It _MAY_ be better to explicitly include resources using other Sprockets directives such as require and require_directory.
 	
-### Step Five
-
-* Create a seed file for songs and seed db.  
-    
-    <code>
-    Song.create(name: "Royals", duration: 186, price: 3.99)
-    Song.create(name: "Wrecking Ball", duration: 195, price: 3.49)
-    Song.create(name: "Roar", duration: 205, price: 2.99)
-    Song.create(name: "Wake me up", duration: 243, price: 2.49)
-    </code>
-    
-* goto /songs and view songs.
-
-### Step Six
-
-* This should be the contents of the app/views/songs/index.html.erb file.  
-   
-    ``<ul id='songs'>``  
-    ``<%= @songs.each do |song| %>``  
-    ``<li>Name: <%=song.name %>, Duration(minutes): <%=song.duration %>, Price(dollars): <%=song.price %> </li>``  
-    ``<% end %>``  
-    ``</ul>``  
-    ``<br>``  
-
-    ``<%= link_to 'New Song', new_song_path, id: 'new_link', remote: true %>``  
-	
-
-* Notice that we've added the 'remote: true' to the new song link. This will make 
-    the form submit an ajax request. It will *not* reload the page.
-
-### Step Seven
-* Create a new.js.erb file with this contents.  
-      `` $('#new_link').hide().after('<%= j render("form") %>')``
-
-* Change the first line of the _form.html.erb to be.    
-      `` <%= form_for(@song, :remote => true) do |f| %> ``
-
-* Update the create action to respond to a javascript/ajax request.   
-
-    ``def create``   
-    `` ... ``  
-    ``  format.js ``  
-    ``   .. ``  
-    ``end``  
-    
-* Add a create.js.erb file with the below contents.  n
-
-    ``$('#new_task').remove();``  
-    ``$('#new_link').show();``  
-    ``$('#songs').append("<li>"+ "Name: <%=@song.name %>" + ", Duration(minutes): <%=@song.duration %>" + ", Price(dollars): <%=@song.price %>" + "</li>");``
-    ``$('#new_song').hide();``   
-
-* This will use jquery selectors to change the index page.
-
-## Step Eight
-
-* Create a file show.js.erb with this contents.  
-     ``<li><%=song.name%></li>``
-
-* Goto http://localhost:3000/songs and create a new song.  
-  Notice how there are *NO* page reloads when creating new songs. All 
-   the creations are done via ajax and jquery.
+This [Asset Pipeline Article](http://railsapps.github.io/rails-javascript-include-external.html) gives a good overview of how one can selectively add javascript files to a rails app.
 
 ## Resources
 
